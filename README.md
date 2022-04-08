@@ -28,6 +28,6 @@ target/release/cv #二进制文件可单独拷贝传到容器内执行
 - 运行
 ```
 #容器内部测试
-export NAMESPACE=mp-hk  
-./cv open-api      // open-api是指定的cm名
+export NAMESPACE=myns
+./cv configmap_api      // configmap_api是指定的cm名
 ```
