@@ -13,8 +13,14 @@ async fn main() -> anyhow::Result<()> {
     // 从环境变量中读取NAMESPACE
     let namespace = std::env::var("NAMESPACE").unwrap_or_else(|_| "default".into());
     // 读取参数
-    let args = std::env::args().nth(1).expect("Did not provide  argument");
-
+    let args: Vec<String> = std::env::args().collect();
+    // println!("{:?}",args.len());
+    if args.len() != 3 {
+         panic!(
+             "please input configmap name and file name.\
+         example: {} open-api application.yml",&args[0]
+         )
+    }
     let cms: Api<ConfigMap> = Api::namespaced(client, &namespace);
     let lp = ListParams::default();
 
@@ -27,10 +33,12 @@ async fn main() -> anyhow::Result<()> {
                 let yaml_data = &elem.data;
                 // 匹配输入的cm名获取对应的configmap内容
                 if let Some(name) = yaml_name {
-                    if name == &args {
+                    let filename = &args[2];
+                     // println!("{:?},{:?},{:?}",&name,&args[1],&args[2]);
+                    if name == &args[1]  {
                         if let Some(data) = yaml_data {
-                            let v = serde_json::to_value(data)?;
-                            println!("{}", v);
+                            let v = serde_json::to_value(data.get(filename))?;
+                            println!("{}", v.to_string().trim());
                         }
                     }
                 }
@@ -40,3 +48,4 @@ async fn main() -> anyhow::Result<()> {
     }
     Ok(())
 }
+
